@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Welcome.md",
+                "file": "02_Operaciones/SYSADMIN.md.md",
                 "mode": "source",
                 "source": false
               }
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Welcome.md",
+                "file": "02_Operaciones/SYSADMIN.md.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -116,7 +116,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Welcome.md",
+                "file": "02_Operaciones/SYSADMIN.md.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -139,7 +139,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Welcome.md"
+                "file": "02_Operaciones/SYSADMIN.md.md"
               }
             }
           }
@@ -160,9 +160,18 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "5197652176939926",
+  "active": "039d192a0053a44f",
   "lastOpenFiles": [
-    "Untitled",
-    "Welcome.md"
+    "02_Operaciones/SYSADMIN.md",
+    "01_Identidades/garai/SOUL.md.md",
+    "02_Operaciones/SYSADMIN.md.md",
+    "01_Identidades/garai/SYSADMIN.md.md",
+    "01_Identidades/garai/MAP.md.md",
+    "01_Identidades/garai/USER.md.md",
+    "Welcome.md",
+    "01_Identidades/garai",
+    "02_Operaciones",
+    "01_Identidades",
+    "Untitled"
   ]
 }

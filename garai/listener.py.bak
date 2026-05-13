@@ -1,0 +1,168 @@
+import os
+import sys
+import time
+import requests
+from dotenv import load_dotenv
+
+# ==========================================
+# 1. CONFIGURACIÓN DE RUTAS Y ENTORNO
+# ==========================================
+# Detecta la raíz /home/garai/agents-workspace
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Agregamos BASE_DIR al path de Python para poder importar desde 'shared'
+sys.path.append(BASE_DIR)
+from shared.tools import AVAILABLE_TOOLS
+
+ENV_PATH = os.path.join(BASE_DIR, "shared", ".env")
+
+# Rutas exactas
+SOUL_PATH = os.path.join(BASE_DIR, "docs", "GarAI-Brain", "01_Identidades", "garai", "SOUL.md.md")
+USER_PATH = os.path.join(BASE_DIR, "docs", "GarAI-Brain", "01_Identidades", "garai", "USER.md.md")
+
+load_dotenv(dotenv_path=ENV_PATH)
+OPENROUTER_KEY = os.getenv("OPENROUTER_API_KEY")
+MODEL = os.getenv("AGENT_MODEL") 
+TG_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TG_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+def get_full_context():
+    """Carga la identidad del CEO y el perfil del Fundador para evitar alucinaciones."""
+    try:
+        with open(SOUL_PATH, "r", encoding="utf-8") as f: soul = f.read()
+        with open(USER_PATH, "r", encoding="utf-8") as f: user = f.read()
+        return f"{soul}\n\n{user}"
+    except Exception as e:
+        return f"Error cargando identidad: {e}"
+
+def send_telegram(text):
+    """Envía la respuesta final a Sebastian vía Telegram."""
+    url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
+    try:
+        requests.post(url, json={"chat_id": TG_CHAT_ID, "text": text}, timeout=10)
+    except Exception as e:
+        print(f"[-] Error enviando Telegram: {e}")
+
+def ask_openrouter(messages):
+    """Comunica con el cerebro en la nube con manejo robusto de errores y debug."""
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/garaiclawd/agents-workspace"
+    }
+    payload = {"model": MODEL, "messages": messages, "temperature": 0.3}
+    
+    try:
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=payload, timeout=30)
+        
+        if response.status_code != 200:
+            print(f"[-] Error API ({response.status_code}): {response.text}")
+            return f"ERROR_API_{response.status_code}"
+            
+        res_json = response.json()
+        
+        if 'choices' not in res_json:
+            print(f"\n[!] ALERTA: OpenRouter no devolvió 'choices'. JSON crudo: {res_json}\n")
+            
+        content = res_json.get('choices', [{}])[0].get('message', {}).get('content')
+        
+        if content is None or str(content).strip() == "":
+            print(f"\n[!] ERROR_VACIO DETECTADO. JSON crudo: {res_json}\n")
+            return "ERROR_VACIO"
+            
+        return str(content)
+    except Exception as e:
+        print(f"[-] Error de conexión: {e}")
+        return "ERROR_CONEXION"
+
+def listen():
+    """Bucle principal de escucha y ejecución de herramientas del CEO."""
+    last_update_id = 0
+    print(f"[*] GarAI CEO operativo. Escuchando a Sebastian... (Modelo: {MODEL})")
+    
+    while True:
+        try:
+            url = f"https://api.telegram.org/bot{TG_TOKEN}/getUpdates?offset={last_update_id + 1}&timeout=30"
+            updates_res = requests.get(url, timeout=35)
+            updates = updates_res.json()
+
+            if "result" in updates:
+                for update in updates["result"]:
+                    last_update_id = update["update_id"]
+                    
+                    if "message" not in update or str(update["message"]["chat"]["id"]) != TG_CHAT_ID:
+                        continue
+
+                    user_text = update["message"].get("text", "")
+                    if not user_text: continue
+
+                    print(f"\n[+] Sebastian: {user_text}")
+                    
+                    system_msg = (
+                        f"{get_full_context()}\n\n"
+                        "=== PROTOCOLO DE HERRAMIENTAS Y ENTORNO ===\n"
+                        f"Ruta raíz del workspace: {BASE_DIR}\n"
+                        "Eres el CEO de este servidor Linux. Tienes acceso completo a la infraestructura.\n\n"
+                        "Para usar herramientas, DEBES incluir el formato: TOOL: funcion(argumento)\n"
+                        "REGLA DE ORO: Solo puedes invocar UNA (1) herramienta por mensaje. Si necesitas correr varios comandos de consola juntos, únelos con '&&' (ejemplo: TOOL: run_command(free -h && df -h)). ¡NUNCA pongas dos veces la palabra TOOL en la misma respuesta!\n"
+                        "Herramientas disponibles:\n"
+                        "1. list_files(ruta) -> Lista archivos de un directorio.\n"
+                        "2. read_file(ruta) -> Lee código, MDs, logs.\n"
+                        "3. write_file(ruta|||contenido) -> Crea o modifica archivos. Usa TRES BARRAS VERTICALES para separar ruta y contenido.\n"
+                        "4. run_command(comando) -> Ejecuta bash. Úsalo para ver info de Linux (ej. 'df -h', 'free -m', 'ls -la') o manejar procesos de PM2 (ej. 'pm2 status', 'pm2 logs --nostream --lines 50').\n\n"
+                        "REGLA CRÍTICA: Nunca inventes información. Si no sabes algo del sistema, usa run_command o list_files para averiguarlo primero.\n"
+                        f"Si el usuario te pide revisar memoria, disco, pm2 o gestionar la infraestructura, ANTES de ejecutar comandos de diagnóstico, usa read_file para leer tu manual en: {os.path.join(BASE_DIR, 'docs', 'GarAI-Brain', '02_Operaciones', 'SYSADMIN.md')}"
+                    )
+                    
+                    messages = [{"role": "system", "content": system_msg}, {"role": "user", "content": user_text}]
+
+                    # Aumentamos a 6 pasos de pensamiento para darle más aire
+                    max_steps = 6
+                    for i in range(max_steps):
+                        print(f"[*] Pensando paso {i+1}...")
+                        ai_res = ask_openrouter(messages)
+                        
+                        if "ERROR" in ai_res:
+                            send_telegram(f"❌ Error en el cerebro ({ai_res}). Intenta de nuevo.")
+                            break
+
+                        if "TOOL:" in ai_res:
+                            try:
+                                tool_index = ai_res.find("TOOL:")
+                                call = ai_res[tool_index:].replace("TOOL:", "").strip()
+                                
+                                func = call.split("(")[0].strip()
+                                arg_raw = call[call.find("(")+1 : call.rfind(")")].strip()
+                                
+                                if arg_raw.startswith("comando="): arg_raw = arg_raw.replace("comando=", "", 1).strip()
+                                if arg_raw.startswith("ruta="): arg_raw = arg_raw.replace("ruta=", "", 1).strip()
+                                
+                                if arg_raw.startswith(('"', "'")) and arg_raw.endswith(('"', "'")):
+                                    arg_raw = arg_raw[1:-1]
+                                
+                                print(f"[*] Ejecutando herramienta: {func}({arg_raw})")
+                                
+                                tool_result = AVAILABLE_TOOLS.get(func, lambda x: "Error: Función no existe")(arg_raw if arg_raw else ".")
+                                
+                                messages.append({"role": "assistant", "content": ai_res})
+                                messages.append({"role": "user", "content": f"RESULTADO DE LA HERRAMIENTA:\n{tool_result}\n\n(Analiza este resultado y responde al usuario o ejecuta otra herramienta si lo necesitas)"})
+                                
+                                # SISTEMA ANTIGHOSTING
+                                if i == max_steps - 1:
+                                    send_telegram("⚠️ Alcancé mi límite de razonamiento procesando este comando. Ejecuté herramientas en el servidor, pero por favor revisa mis logs o haz un pedido más específico.")
+                                
+                                continue 
+                            except Exception as e:
+                                messages.append({"role": "system", "content": f"Error de formato al llamar herramienta: {e}"})
+                                continue
+                        else:
+                            send_telegram(ai_res)
+                            print(f"[+] GarAI: {ai_res}")
+                            break
+
+        except Exception as e:
+            print(f"[-] Error en el bucle: {e}")
+            time.sleep(5)
+
+if __name__ == "__main__":
+    listen()

@@ -1,0 +1,22 @@
+.
+├── docs
+│   └── GarAI-Brain
+│       ├── 01_Identidades
+│       │   └── garai
+│       │       ├── MAP.md.md
+│       │       ├── SOUL.md.md
+│       │       └── USER.md.md
+│       ├── 02_Operaciones
+│       └── Welcome.md
+├── estructura.txt
+├── garai
+│   ├── boot.py
+│   ├── listener.py
+│   └── tools.py
+├── lana
+├── roi-berto
+├── shared
+├── sniper
+└── sudo
+
+12 directories, 8 files
