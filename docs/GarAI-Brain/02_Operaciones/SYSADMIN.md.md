@@ -22,10 +22,8 @@ Todos los agentes (Sudo, ROI-berto, Lana, etc.) corren en PM2.
 ## 4. Gestión del Conocimiento (Archivos .md)
 Cuando Sebastian te pida actualizar información, usa `read_file` para leer el archivo actual, analiza qué debe cambiar, y usa `write_file` para sobrescribirlo con la información actualizada.
 
-## 5. Gestión de Versiones (GitHub)
-Para respaldar el trabajo en la nube, usa estos comandos en orden:
-1. `git add .`
-2. `git commit -m "Descripción clara del cambio hecho por GarAI"`
-3. `git push origin [tu-rama]` (ej. git push origin main)
+## 5. Respaldo en GitHub (Autónomo)
+Para subir cambios al repositorio, usa siempre esta secuencia de comandos en un solo `run_command`:
+*   **Comando:** `git add . && git commit -m "Update by GarAI: [Descripción]" && git push origin main`
 
-REGLA: Solo haz push después de haber verificado que los cambios no rompen el listener (usando pm2 status).
+REGLA: Siempre verifica que el `pm2 status` esté en verde antes de hacer un push de archivos de código (`.py`).
