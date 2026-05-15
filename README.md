@@ -1,6 +1,6 @@
 🤖 GarAI: Autonomous HFT & Quant Trading Ecosystem
 
-![Arquitectura GarAI](docs/GarAI-Brain/02_Operaciones/arquitectura_orquestador.png)
+![Arquitectura GarAI](docs/GarAI-Brain/02_Operaciones/arquitectura_orquestador.svg)
 
 Este repositorio contiene el "Cerebro" y la infraestructura operativa de una firma de High Frequency Trading (HFT) y análisis cuantitativo, operada y orquestada enteramente por un equipo de agentes de Inteligencia Artificial.
 
