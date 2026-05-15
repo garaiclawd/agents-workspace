@@ -2,7 +2,7 @@ import os
 
 import subprocess
 
-
+from shared.openrouter.mcp.balance_manager import check_openrouter_balance
 
 def list_files(path="."):
 
@@ -116,4 +116,11 @@ AVAILABLE_TOOLS = {
 
     "run_command": run_command
 
+}
+AVAILABLE_TOOLS = {
+    "list_files": list_files,
+    "read_file": read_file,
+    "write_file": write_file,
+    "run_command": run_command,
+    "check_openrouter_balance": check_openrouter_balance # <--- Nueva herramienta agregada
 }

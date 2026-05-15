@@ -76,9 +76,13 @@ def ask_openrouter(messages):
 def procesar_y_responder(user_text, placeholder_id, current_history):
     print(f"[*] Procesando en hilo secundario: {user_text[:20]}...")
     
+    # Extraemos los nombres de las herramientas dinámicamente
+    herramientas_disponibles = ", ".join(AVAILABLE_TOOLS.keys())
+    
     system_msg = (
         f"{get_full_context()}\n\n"
         "=== PROTOCOLO DE HERRAMIENTAS ===\n"
+        f"Herramientas nativas disponibles: {herramientas_disponibles}\n"
         "Para usar herramientas responde: TOOL: funcion(argumento)\n"
         "NO uses comillas triples ni bloques de código para la TOOL.\n"
         "Si vas a usar run_command, no pongas paréntesis extra dentro del comando.\n"

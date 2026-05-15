@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "02_Operaciones/SYSADMIN.md.md",
+                "file": "01_Identidades/garai/VISION.md",
                 "mode": "source",
                 "source": false
               }
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "02_Operaciones/SYSADMIN.md.md",
+                "file": "01_Identidades/garai/VISION.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -116,7 +116,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "02_Operaciones/SYSADMIN.md.md",
+                "file": "01_Identidades/garai/VISION.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -139,7 +139,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "02_Operaciones/SYSADMIN.md.md"
+                "file": "01_Identidades/garai/VISION.md"
               }
             }
           }
@@ -160,14 +160,16 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "039d192a0053a44f",
+  "active": "5197652176939926",
   "lastOpenFiles": [
+    "01_Identidades/garai/SOUL.md",
+    "01_Identidades/garai/USER.md",
+    "01_Identidades/garai/VISION.md",
     "02_Operaciones/SYSADMIN.md",
-    "01_Identidades/garai/SOUL.md.md",
     "02_Operaciones/SYSADMIN.md.md",
+    "01_Identidades/garai/MAP.md",
+    "Untitled.md",
     "01_Identidades/garai/SYSADMIN.md.md",
-    "01_Identidades/garai/MAP.md.md",
-    "01_Identidades/garai/USER.md.md",
     "Welcome.md",
     "01_Identidades/garai",
     "02_Operaciones",
