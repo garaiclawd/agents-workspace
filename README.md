@@ -1,7 +1,3 @@
-Aquí tienes una propuesta para tu README.md. Está redactada con un tono profesional, técnico y orientado a la visión empresarial que acabamos de establecer. Consolida tu infraestructura actual, el esquema de agentes y los objetivos a largo plazo en un documento de presentación impecable.
-
-Puedes copiar este bloque y pedirle a GarAI que lo escriba directamente en la raíz de tu repositorio:
-
 🤖 GarAI: Autonomous HFT & Quant Trading Ecosystem
 Este repositorio contiene el "Cerebro" y la infraestructura operativa de una firma de High Frequency Trading (HFT) y análisis cuantitativo, operada y orquestada enteramente por un equipo de agentes de Inteligencia Artificial.
 
