@@ -20,8 +20,8 @@ from langgraph.graph import StateGraph, END
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(BASE_DIR)
 
-# Importamos las herramientas (tools.py debe estar intacto en shared/tools.py)
-from shared.tools import AVAILABLE_TOOLS
+# Importamos las herramientas desde el nuevo orquestador SYSADMIN.py
+from shared.SYSADMIN import AVAILABLE_TOOLS
 
 ENV_PATH = os.path.join(BASE_DIR, "shared", ".env")
 SOUL_PATH = os.path.join(BASE_DIR, "docs", "GarAI-Brain", "01_Identidades", "garai", "SOUL.md")
@@ -165,7 +165,6 @@ def nodo_herramientas(state: EnterpriseState):
             if arg_raw.startswith(noise): arg_raw = arg_raw.replace(noise, "", 1).strip()
         if arg_raw.startswith(('"', "'")) and arg_raw.endswith(('"', "'")): arg_raw = arg_raw[1:-1]
         
-        # FIX APLICADO: Eliminado el argumento inválido parse_mode de esta llamada
         if placeholder_id:
             edit_telegram(placeholder_id, f"⚙️ Ejecutando herramienta: <b>{func}</b>...")
         

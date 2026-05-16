@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "01_Identidades/garai/VISION.md",
+                "file": "02_Operaciones/SYSADMIN.md",
                 "mode": "source",
                 "source": false
               }
@@ -99,7 +99,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "01_Identidades/garai/VISION.md",
+                "file": "02_Operaciones/SYSADMIN.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -116,7 +116,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "01_Identidades/garai/VISION.md",
+                "file": "02_Operaciones/SYSADMIN.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -139,7 +139,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "01_Identidades/garai/VISION.md"
+                "file": "02_Operaciones/SYSADMIN.md"
               }
             }
           }
@@ -160,8 +160,12 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "039d192a0053a44f",
+  "active": "5197652176939926",
   "lastOpenFiles": [
+    "02_Operaciones/arquitectura_orquestador.drawio",
+    "02_Operaciones/arquitectura_orquestador.svg",
+    "01_Identidades/garai/SOUL.md",
+    "01_Identidades/garai/VISION.md",
     "01_Identidades/roi-berto/MAP.md",
     "01_Identidades/roi-berto/SOUL.md",
     "01_Identidades/lana/MAP.md",
@@ -171,9 +175,7 @@
     "01_Identidades/roi-berto",
     "01_Identidades/lana",
     "01_Identidades/sudo",
-    "01_Identidades/garai/SOUL.md",
     "01_Identidades/garai/USER.md",
-    "01_Identidades/garai/VISION.md",
     "02_Operaciones/SYSADMIN.md",
     "02_Operaciones/SYSADMIN.md.md",
     "01_Identidades/garai/MAP.md",

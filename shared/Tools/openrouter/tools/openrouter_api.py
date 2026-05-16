@@ -2,8 +2,8 @@ import os
 import requests
 from dotenv import load_dotenv
 
-# Calculamos la ruta absoluta al .env basándonos en la estructura de carpetas
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Subimos 4 niveles: tools -> openrouter -> Tools -> shared
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 ENV_PATH = os.path.join(BASE_DIR, ".env")
 load_dotenv(dotenv_path=ENV_PATH)
 
