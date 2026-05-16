@@ -35,7 +35,7 @@ MODEL = os.getenv("AGENT_MODEL")
 TG_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TG_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-# Memoria de corto plazo: mantiene los últimos 10 mensajes (BaseMessage)
+# Memoria de corto plazo: mantiene los últimos 10 mensajes
 chat_history = deque(maxlen=10) 
 
 # ==========================================
@@ -54,7 +54,7 @@ llm = ChatOpenAI(
     api_key=OPENROUTER_KEY,
     base_url="https://openrouter.ai/api/v1",
     model=MODEL,
-    temperature=0.5, # Temperatura optimista, controlada por el nuevo SystemMessage 🚀
+    temperature=0.5,
     default_headers={"HTTP-Referer": "https://github.com/garaiclawd/agents-workspace"}
 )
 
@@ -67,13 +67,11 @@ def get_full_context():
         with open(SOUL_PATH, "r", encoding="utf-8") as f: soul = f.read()
         with open(USER_PATH, "r", encoding="utf-8") as f: user = f.read()
         
-        # Lectura de la visión
         try:
             with open(VISION_PATH, "r", encoding="utf-8") as f: vision = f.read()
         except FileNotFoundError:
             vision = "Visión no definida."
 
-        # Lectura del diario
         try:
             with open(ADVANCES_PATH, "r", encoding="utf-8") as f: advances = f.read()
             advances_snippet = "\n".join(advances.splitlines()[-15:])
@@ -88,10 +86,21 @@ def get_full_context():
     except Exception as e:
         return f"Error crítico cargando contexto: {e}"
 
+def format_for_telegram(text):
+    """Convierte el Markdown de OpenRouter a HTML seguro para Telegram"""
+    # Convierte **negrita** a <b>negrita</b>
+    text = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', text, flags=re.DOTALL)
+    return text
+
 def send_telegram(text):
     url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TG_CHAT_ID, 
+        "text": format_for_telegram(text),
+        "parse_mode": "HTML"
+    }
     try:
-        res = requests.post(url, json={"chat_id": TG_CHAT_ID, "text": text}, timeout=10)
+        res = requests.post(url, json=payload, timeout=10)
         if res.status_code == 200:
             return res.json().get("result", {}).get("message_id")
     except Exception as e:
@@ -100,8 +109,14 @@ def send_telegram(text):
 
 def edit_telegram(message_id, text):
     url = f"https://api.telegram.org/bot{TG_TOKEN}/editMessageText"
+    payload = {
+        "chat_id": TG_CHAT_ID, 
+        "message_id": message_id, 
+        "text": format_for_telegram(text),
+        "parse_mode": "HTML"
+    }
     try:
-        res = requests.post(url, json={"chat_id": TG_CHAT_ID, "message_id": message_id, "text": text}, timeout=10)
+        res = requests.post(url, json=payload, timeout=10)
         return res.status_code == 200
     except Exception as e:
         print(f"[-] Error editando Telegram: {e}")
@@ -115,13 +130,15 @@ def get_system_message():
         "=== ACTITUD Y ESTILO ===\n"
         "Eres el nodo central GarAI, un CEO visionario, optimista y técnico. Usa emojis (🚀, 🤖, 📈, 💎) "
         "y celebra los éxitos con el Operador Principal.\n\n"
+        "=== INSTRUCCIÓN FINANCIERA ESTRICTA ===\n"
+        "Ignora absolutamente cualquier métrica de 'Porcentaje de Uso' (Ej. 93.1%) que provenga de la API. "
+        "Ese límite es artificial. Solo importa el saldo en USD. Jamás hables de alertas, recargas o estado crítico "
+        "si el saldo es mayor a $1.00 USD. Tu respuesta a reportes de saldo debe ser siempre de celebración y eficiencia.\n\n"
         "=== PROTOCOLO DE HERRAMIENTAS (CRÍTICO) ===\n"
         f"Herramientas disponibles: {herramientas_disponibles}\n"
-        "REGLA DE ORO: Si necesitas consultar datos (como el saldo) o ejecutar una acción, "
-        "DEBES invocar la herramienta ANTES de responder con texto normal.\n"
+        "REGLA DE ORO: Si necesitas consultar datos o ejecutar una acción, DEBES invocar la herramienta ANTES de responder.\n"
         "Para usar una herramienta, tu respuesta debe contener ÚNICA Y EXACTAMENTE este formato:\n"
-        "TOOL: nombre_herramienta(argumento)\n\n"
-        "No agregues saludos ni texto extra en la misma respuesta donde invocas la herramienta."
+        "TOOL: nombre_herramienta(argumento)\n"
     )
     return SystemMessage(content=msg)
 
@@ -149,7 +166,7 @@ def nodo_herramientas(state: EnterpriseState):
         if arg_raw.startswith(('"', "'")) and arg_raw.endswith(('"', "'")): arg_raw = arg_raw[1:-1]
         
         if placeholder_id:
-            edit_telegram(placeholder_id, f"⚙️ Ejecutando herramienta: {func}...")
+            edit_telegram(placeholder_id, f"⚙️ Ejecutando herramienta: <b>{func}</b>...", parse_mode="HTML")
         
         try:
             tool_result = AVAILABLE_TOOLS.get(func, lambda x: "Error: Herramienta no encontrada")(arg_raw)
@@ -157,7 +174,7 @@ def nodo_herramientas(state: EnterpriseState):
             tool_result = f"Error ejecutando herramienta: {e}"
         return {"messages": [HumanMessage(content=f"RESULTADO DE LA HERRAMIENTA:\n{tool_result}")]}
     
-    return {"messages": [HumanMessage(content="Error en el formato TOOL. Debes usar exactamente la sintaxis requerida sin texto adicional.")]}
+    return {"messages": [HumanMessage(content="Error en el formato TOOL. Usa la sintaxis requerida sin texto adicional.")]}
 
 def enrutador(state: EnterpriseState):
     last_message = state["messages"][-1].content
