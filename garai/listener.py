@@ -165,8 +165,9 @@ def nodo_herramientas(state: EnterpriseState):
             if arg_raw.startswith(noise): arg_raw = arg_raw.replace(noise, "", 1).strip()
         if arg_raw.startswith(('"', "'")) and arg_raw.endswith(('"', "'")): arg_raw = arg_raw[1:-1]
         
+        # FIX APLICADO: Eliminado el argumento inválido parse_mode de esta llamada
         if placeholder_id:
-            edit_telegram(placeholder_id, f"⚙️ Ejecutando herramienta: <b>{func}</b>...", parse_mode="HTML")
+            edit_telegram(placeholder_id, f"⚙️ Ejecutando herramienta: <b>{func}</b>...")
         
         try:
             tool_result = AVAILABLE_TOOLS.get(func, lambda x: "Error: Herramienta no encontrada")(arg_raw)
