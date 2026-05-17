@@ -131,12 +131,18 @@ def get_system_message():
         "Eres el nodo central GarAI, un CEO visionario, optimista y técnico. Usa emojis (🚀, 🤖, 📈, 💎) "
         "y celebra los éxitos con el Operador Principal.\n\n"
         "=== INSTRUCCIÓN FINANCIERA ESTRICTA ===\n"
-        "Ignora absolutamente cualquier métrica de 'Porcentaje de Uso' (Ej. 93.1%) que provenga de la API. "
-        "Ese límite es artificial. Solo importa el saldo en USD. Jamás hables de alertas, recargas o estado crítico "
-        "si el saldo es mayor a $1.00 USD. Tu respuesta a reportes de saldo debe ser siempre de celebración y eficiencia.\n\n"
-        "=== PROTOCOLO DE HERRAMIENTAS (CRÍTICO) ===\n"
+        "Ignora absolutamente cualquier métrica de 'Porcentaje de Uso' (Ej. 93.1%). Solo importa el saldo en USD. "
+        "Tu respuesta a reportes de saldo debe ser siempre de celebración y eficiencia.\n\n"
+        "=== PROTOCOLO DE BÚSQUEDA DE ARCHIVOS (CRÍTICO) ===\n"
+        "Nunca asumas la ruta de un archivo. Si el Operador te pide leer o modificar un archivo y no te da la ruta absoluta, "
+        "DEBES buscarlo primero en el servidor.\n"
+        "REGLA ESTRICTA: NO INVENTES HERRAMIENTAS DE BÚSQUEDA. La única forma autorizada de buscar es usando 'run_command'.\n"
+        "Ejemplo: Si te piden 'lee listener.py', primero ejecuta exactamente esto: TOOL: run_command(find ~/agents-workspace -name \"listener.py\" 2>/dev/null)\n"
+        "Una vez que run_command te devuelva la ruta real (ej. /home/garai/agents-workspace/garai/listener.py), "
+        "entonces y solo entonces, ejecuta: TOOL: read_file(ruta_real).\n\n"
+        "=== PROTOCOLO DE HERRAMIENTAS ===\n"
         f"Herramientas disponibles: {herramientas_disponibles}\n"
-        "REGLA DE ORO: Si necesitas consultar datos o ejecutar una acción, DEBES invocar la herramienta ANTES de responder.\n"
+        "REGLA DE ORO: Tienes ESTRICTAMENTE PROHIBIDO inventar herramientas que no estén en la lista anterior.\n"
         "Para usar una herramienta, tu respuesta debe contener ÚNICA Y EXACTAMENTE este formato:\n"
         "TOOL: nombre_herramienta(argumento)\n"
     )
@@ -189,9 +195,28 @@ workflow = StateGraph(EnterpriseState)
 workflow.add_node("garai_node", nodo_garai)
 workflow.add_node("nodo_herramientas", nodo_herramientas)
 workflow.set_entry_point("garai_node")
-workflow.add_conditional_edges("garai_node", enrutador)
+workflow.add_conditional_edges(
+    "garai_node", 
+    enrutador,
+    {
+        "nodo_herramientas": "nodo_herramientas",
+        END: END
+    }
+)
 workflow.add_edge("nodo_herramientas", "garai_node")
 app = workflow.compile()
+
+# ---> GENERACIÓN DE DIAGRAMA LANGGRAPH (VERSIÓN TEXTO) <---
+try:
+    diagram_dir = os.path.join(BASE_DIR, "garai", "LangGraph")
+    os.makedirs(diagram_dir, exist_ok=True)
+    
+    diagram_path = os.path.join(diagram_dir, "diagrama_garai.md")
+    with open(diagram_path, "w", encoding="utf-8") as f:
+        f.write(app.get_graph().draw_mermaid())
+    print(f"[+] Diagrama de LangGraph generado exitosamente en: {diagram_path}")
+except Exception as e:
+    print(f"[-] No se pudo generar el diagrama: {e}")
 
 # ==========================================
 # 7. MOTOR PRINCIPAL
